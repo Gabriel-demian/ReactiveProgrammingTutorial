@@ -1,10 +1,14 @@
 package com.demo.reactiverogramming.fluxandmonoplayground;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@ActiveProfiles("test")
+@DirtiesContext
 public class FluxAndMonoTest {
 
     @Test
