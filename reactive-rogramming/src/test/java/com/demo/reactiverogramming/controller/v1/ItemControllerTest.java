@@ -1,9 +1,7 @@
 package com.demo.reactiverogramming.controller.v1;
 
-import com.demo.reactiverogramming.constants.ItemConstant;
 import com.demo.reactiverogramming.document.Item;
 import com.demo.reactiverogramming.repository.ItemReactiveRepository;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +19,7 @@ import reactor.test.StepVerifier;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.demo.reactiverogramming.constants.ItemConstant.ITEM_END_POINT_V1;
 import static com.mongodb.assertions.Assertions.assertTrue;
 
 @SpringBootTest
@@ -60,7 +59,7 @@ public class ItemControllerTest {
 
     @Test
     public void getAllItemsTest(){
-        webTestClient.get().uri(ItemConstant.ITEM_END_POINT_V1)
+        webTestClient.get().uri(ITEM_END_POINT_V1)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -70,7 +69,7 @@ public class ItemControllerTest {
 
     @Test
     public void getAllItemsTest2(){
-        webTestClient.get().uri(ItemConstant.ITEM_END_POINT_V1)
+        webTestClient.get().uri(ITEM_END_POINT_V1)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +85,7 @@ public class ItemControllerTest {
 
     @Test
     public void getAllItemsTest3(){
-        Flux<Item> itemsFlux = webTestClient.get().uri(ItemConstant.ITEM_END_POINT_V1)
+        Flux<Item> itemsFlux = webTestClient.get().uri(ITEM_END_POINT_V1)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -98,4 +97,19 @@ public class ItemControllerTest {
                 .verifyComplete();
     }
 
+    @Test
+    public void getOneItem_OK(){
+        webTestClient.get().uri(ITEM_END_POINT_V1.concat("/{id}"), "12345")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.price", 189.61);
+    }
+
+    @Test
+    public void getOneItem_NOT_FOUND(){
+        webTestClient.get().uri(ITEM_END_POINT_V1.concat("/{id}"), "54321")
+                .exchange()
+                .expectStatus().isNotFound();
+    }
 }
