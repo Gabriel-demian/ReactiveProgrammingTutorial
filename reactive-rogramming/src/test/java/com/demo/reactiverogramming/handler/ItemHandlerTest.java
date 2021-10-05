@@ -14,11 +14,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static com.demo.reactiverogramming.constants.ItemConstant.ITEM_FUNCTIONAL_END_POINT_V1;
+import static com.mongodb.assertions.Assertions.assertTrue;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -63,6 +65,36 @@ public class ItemHandlerTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBodyList(Item.class)
                 .hasSize(5);
+    }
+
+    @Test
+    public void getAllItemsTest2(){
+        webTestClient.get().uri(ITEM_FUNCTIONAL_END_POINT_V1)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(Item.class)
+                .hasSize(5)
+                .consumeWith((response) -> {
+                    List<Item> items = response.getResponseBody();
+                    items.forEach((item) -> {
+                        assertTrue(item.getId() != null);
+                    });
+                });
+    }
+
+    @Test
+    public void getAllItemsTest3(){
+        Flux<Item> itemsFlux = webTestClient.get().uri(ITEM_FUNCTIONAL_END_POINT_V1)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .returnResult(Item.class)
+                .getResponseBody();
+
+        StepVerifier.create(itemsFlux.log("Value from network : "))
+                .expectNextCount(5)
+                .verifyComplete();
     }
 
 }
