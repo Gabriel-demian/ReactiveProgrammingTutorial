@@ -140,4 +140,33 @@ public class ItemHandlerTest {
                 .expectBody(Void.class);
     }
 
+    @Test
+    public void updateItemTest(){
+        double newPrice = 129.99;
+        Item item = new Item(null, "Samsung Watch", newPrice);
+
+        webTestClient.put().uri(ITEM_FUNCTIONAL_END_POINT_V1.concat("/{id}"), "12345")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(item), Item.class)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.price", newPrice);
+
+    }
+
+    @Test
+    public void updateItemNotFoundTest(){
+
+        double newPrice = 129.99;
+        Item item = new Item(null, "Samsung Watch", newPrice);
+
+        webTestClient.put().uri(ITEM_FUNCTIONAL_END_POINT_V1.concat("/{id}"), "DEF")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(item), Item.class)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
 }
